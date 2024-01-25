@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: 'postgres:16.1'
+    environment:
+      POSTGRES_DB: spring-petclinic
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+    ports:
+      - '5432:5432'
