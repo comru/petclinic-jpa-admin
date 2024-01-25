@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1706188625644-1" author="alzlatoverov (generated)">
+        <createTable tableName="owners">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_owners"/>
+            </column>
+            <column name="first_name" type="text"/>
+            <column name="last_name" type="text"/>
+            <column name="address" type="text"/>
+            <column name="city" type="text"/>
+            <column name="telephone" type="text"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1706188625644-2" author="alzlatoverov (generated)">
+        <createTable tableName="pets">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_pets"/>
+            </column>
+            <column name="name" type="text"/>
+            <column name="birth_date" type="DATE"/>
+            <column name="type_id" type="BIGINT"/>
+            <column name="owner_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1706188625644-3" author="alzlatoverov (generated)">
+        <createTable tableName="specialties">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_specialties"/>
+            </column>
+            <column name="name" type="text"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1706188625644-4" author="alzlatoverov (generated)">
+        <createTable tableName="types">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_types"/>
+            </column>
+            <column name="name" type="text"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1706188625644-5" author="alzlatoverov (generated)">
+        <createTable tableName="vet_specialties">
+            <column name="specialty_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_vet_specialties"/>
+            </column>
+            <column name="vet_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_vet_specialties"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1706188625644-6" author="alzlatoverov (generated)">
+        <createTable tableName="vets">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_vets"/>
+            </column>
+            <column name="first_name" type="text"/>
+            <column name="last_name" type="text"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1706188625644-7" author="alzlatoverov (generated)">
+        <createTable tableName="visits">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_visits"/>
+            </column>
+            <column name="visit_date" type="DATE"/>
+            <column name="description" type="text"/>
+            <column name="pet_id" type="BIGINT"/>
+            <column name="assigned_vet_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1706188625644-8" author="alzlatoverov (generated)">
+        <addUniqueConstraint columnNames="specialty_id" constraintName="uc_vet_specialties_specialty"
+                             tableName="vet_specialties"/>
+    </changeSet>
+    <changeSet id="1706188625644-9" author="alzlatoverov (generated)">
+        <createIndex indexName="idx_owners_last_name" tableName="owners">
+            <column name="last_name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1706188625644-10" author="alzlatoverov (generated)">
+        <createIndex indexName="idx_pets_name" tableName="pets">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1706188625644-12" author="alzlatoverov (generated)">
+        <createIndex indexName="idx_specialties_name" tableName="specialties">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1706188625644-13" author="alzlatoverov (generated)">
+        <createIndex indexName="idx_types_name" tableName="types">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1706188625644-14" author="alzlatoverov (generated)">
+        <createIndex indexName="idx_vets_last_name" tableName="vets">
+            <column name="last_name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1706188625644-16" author="alzlatoverov (generated)">
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="pets" constraintName="FK_PETS_ON_OWNER"
+                                 referencedColumnNames="id" referencedTableName="owners"/>
+
+        <createIndex indexName="idx_pets_owner_id" tableName="pets">
+            <column name="owner_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1706188625644-17" author="alzlatoverov (generated)">
+        <addForeignKeyConstraint baseColumnNames="type_id" baseTableName="pets" constraintName="FK_PETS_ON_TYPE"
+                                 referencedColumnNames="id" referencedTableName="types"/>
+    </changeSet>
+    <changeSet id="1706188625644-18" author="alzlatoverov (generated)">
+        <addForeignKeyConstraint baseColumnNames="assigned_vet_id" baseTableName="visits"
+                                 constraintName="FK_VISITS_ON_ASSIGNED_VET" referencedColumnNames="id"
+                                 referencedTableName="vets"/>
+    </changeSet>
+    <changeSet id="1706188625644-19" author="alzlatoverov (generated)">
+        <addForeignKeyConstraint baseColumnNames="pet_id" baseTableName="visits" constraintName="FK_VISITS_ON_PET"
+                                 referencedColumnNames="id" referencedTableName="pets"/>
+
+        <createIndex indexName="idx_visits_pet_id" tableName="visits">
+            <column name="pet_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="1706188625644-20" author="alzlatoverov (generated)">
+        <addForeignKeyConstraint baseColumnNames="specialty_id" baseTableName="vet_specialties"
+                                 constraintName="fk_vetspe_on_specialty" referencedColumnNames="id"
+                                 referencedTableName="specialties"/>
+    </changeSet>
+    <changeSet id="1706188625644-21" author="alzlatoverov (generated)">
+        <addForeignKeyConstraint baseColumnNames="vet_id" baseTableName="vet_specialties"
+                                 constraintName="fk_vetspe_on_vet" referencedColumnNames="id"
+                                 referencedTableName="vets"/>
+    </changeSet>
+</databaseChangeLog>
