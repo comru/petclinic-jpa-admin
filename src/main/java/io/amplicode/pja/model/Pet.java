@@ -3,10 +3,13 @@ package io.amplicode.pja.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Getter
@@ -35,5 +38,9 @@ public class Pet extends NamedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private Owner owner;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "user_data")
+    private Map<String, Object> userData;
 
 }

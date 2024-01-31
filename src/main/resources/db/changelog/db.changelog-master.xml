@@ -6,4 +6,5 @@
 
     <include file="db/changelog/init-changelog.xml"/>
     <include file="db/changelog/data-changelog.xml"/>
+    <include file="db/changelog/31-01-changelog.xml"/>
 </databaseChangeLog>

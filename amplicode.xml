@@ -14,6 +14,9 @@
       </database-info>
     </database-infos>
   </component>
+  <component name="AmplicodeLiquibaseChangesConfig">
+    <exclude-change idName="vet_specialties#specialty_id" tagName="addUniqueConstraint" />
+  </component>
   <component name="AmplicodePersistenceUnitSettings">
     <persistence-units>
       <persistence-unit name="Default" defaultIncludeChangeLogFile="src/main/resources/db/changelog/db.changelog-master.xml">
