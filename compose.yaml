@@ -1,9 +1,20 @@
 services:
   postgres:
-    image: 'postgres:16.1'
+    image: postgres:16.1
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: spring-petclinic
-      POSTGRES_PASSWORD: root
       POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: spring-petclinic
     ports:
-      - '5432:5432'
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+volumes:
+  postgres_data:

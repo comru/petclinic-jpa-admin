@@ -74,10 +74,6 @@
             <column name="assigned_vet_id" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet id="1706188625644-8" author="alzlatoverov (generated)">
-        <addUniqueConstraint columnNames="specialty_id" constraintName="uc_vet_specialties_specialty"
-                             tableName="vet_specialties"/>
-    </changeSet>
     <changeSet id="1706188625644-9" author="alzlatoverov (generated)">
         <createIndex indexName="idx_owners_last_name" tableName="owners">
             <column name="last_name"/>

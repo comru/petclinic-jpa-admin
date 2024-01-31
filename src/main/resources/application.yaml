@@ -8,6 +8,7 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.xml
   jpa:
     show-sql: true
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true

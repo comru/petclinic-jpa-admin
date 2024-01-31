@@ -26,7 +26,9 @@ public class Pet extends NamedEntity {
     @JoinColumn(name = "type_id")
     private PetType type;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "pet")
+    //TODO CascadeType.MERGE load all visits collection as eager
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "pet")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH}, mappedBy = "pet")
     @OrderBy("visit_date ASC")
     private Set<Visit> visits = new LinkedHashSet<>();
 
