@@ -13,9 +13,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -26,16 +23,20 @@ public class SearchHelper {
     private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
-    public <R, E> Page<R> findAll(Class<E> entityClass, Class<R> resultClass, Specification<E> specification, Pageable pageable) {
+    public <R, E> Page<R> findAll(Class<E> entityClass,
+                                  Class<R> resultClass,
+                                  List<String> loadProperties,
+                                  Specification<E> specification,
+                                  Pageable pageable) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<R> query = builder.createQuery(resultClass);
         Root<E> root = query.from(entityClass);
 
-        List<Selection<?>> selections = new ArrayList<>();
-        for (Field field : resultClass.getDeclaredFields()) {
-            selections.add(root.get(field.getName()));
-        }
-        query.multiselect(selections).where(specification.toPredicate(root, query, builder));
+//        List<Selection<?>> selections = new ArrayList<>();
+//        for (String property : loadProperties) {
+//            selections.add(root.get(property));
+//        }
+        query.where(specification.toPredicate(root, query, builder));
 
         pageable.getSort().forEach(order -> {
             Path<Object> orderPath = root.get(order.getProperty());
