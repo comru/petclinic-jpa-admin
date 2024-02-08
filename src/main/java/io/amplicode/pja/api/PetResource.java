@@ -7,8 +7,6 @@ import io.amplicode.pja.api.dto.PetMinimalDto;
 import io.amplicode.pja.api.mapper.PetMapper;
 import io.amplicode.pja.model.Pet;
 import io.amplicode.pja.rasupport.RaPatchUtil;
-import io.amplicode.pja.rasupport.SearchHelper;
-import io.amplicode.pja.rasupport.SpecificationFilterConverter;
 import io.amplicode.pja.repository.PetRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -33,20 +31,13 @@ public class PetResource {
 
     private final PetRepository petRepository;
     private final PetMapper petMapper;
-    private final SpecificationFilterConverter specificationFilterConverter;
     @PersistenceContext
     private final EntityManager entityManager;
-
-    private final SearchHelper searchHelper;
-
     private final RaPatchUtil raPatchUtil;
 
 
     @GetMapping
     public Page<PetDto> getList(@ModelAttribute PetFilter filter, @PageableDefault(size = 15) Pageable pageable) {
-//        Specification<Pet> specification = convertFilterToSpecification(filter);
-//        Specification<Pet> specification = specificationFilterConverter.convert(filter);
-
         Specification<Pet> specification = filter.toSpecification();
         Page<Pet> page = petRepository.findAll(specification, pageable);
         return page.map(petMapper::toDto);
@@ -64,26 +55,28 @@ public class PetResource {
 
     @GetMapping("/{id}")
     public PetDto getOne(@PathVariable("id") Long id) {
+        //dynamic projection based class
 //        Optional<PetDto> petOptional = petRepository.findById(id, PetDto.class);
 //        return ResponseEntity.of(petOptional);
 
-        Optional<Pet> petOptional = petRepository.findById(id);
-//        return ResponseEntity.of(petOptional.map(petMapper::toDto));
-        return petOptional.map(petMapper::toDto)
-                .orElseThrow(() -> createEntityNotFoundException(id));
-
-//        Optional<PetDeepInfo> petOptional = petRepository.findById(id, PetDeepInfo.class);
+        //dynamic projection
+//        Optional<PetDeepInfo> petOptio
+//        nal = petRepository.findById(id, PetDeepInfo.class);
 //        return ResponseEntity.of(petOptional);
 
         //при чем разный результат будет при загрузке ассоциаций с @Value и без @Value, а если у одной аннотации указан
         //@Value то вообще упадет)
 //        Optional<PetFlatInfo> petOptional = petRepository.findById(id, PetFlatInfo.class);
 //        return ResponseEntity.of(petOptional);
+
+        Optional<Pet> petOptional = petRepository.findById(id);
+        return petOptional.map(petMapper::toDto)
+                .orElseThrow(() -> createEntityNotFoundException(id));
+
     }
 
     @GetMapping("/by-ids")
     public List<PetMinimalDto> getMany(@RequestParam List<Long> ids) {
-//        List<PetMinimalDto> result = petRepository.findByIdIn(ids, PetMinimalDto.class);
         return petRepository.findAllById(ids)
                 .stream()
                 .map(petMapper::toPetMinimal)
@@ -101,8 +94,7 @@ public class PetResource {
     }
 
     @PutMapping("/{id}")
-    public PetDto update(@PathVariable Long id,
-                                         @RequestBody String petDtoPatch) {
+    public PetDto update(@PathVariable Long id, @RequestBody String petDtoPatch) {
         Pet pet = petRepository.findById(id).orElse(null);
         if (pet == null) {
             throw createEntityNotFoundException(id);
@@ -125,13 +117,10 @@ public class PetResource {
         List<Pet> updatedEntities = new ArrayList<>();
         List<Pet> toUpdatePets = petRepository.findAllById(ids);
 
-        //TODO throw exception new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with `%s` id not found".formatted(id))
-
         for (Pet pet: toUpdatePets) {
             PetDto petDto = petMapper.toDto(pet);
             petDto = raPatchUtil.patchAndValidate(petDto, patchJson);
 
-//            if (petDto.id() != null && !petDto.id().equals(id)) { // attempt to change entity id
             if (petDto.id() != null && !petDto.id().equals(pet.getId())) { // attempt to change entity id
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id");
             }
@@ -147,8 +136,6 @@ public class PetResource {
 
     @DeleteMapping("/{id}")
     public PetDto delete(@PathVariable Long id) {
-        //The record that has been deleted
-
         //TODO case 1
 //        Optional<PetDto> petDto = petRepository.findById(id)
 //                .map(petMapper::toDto);

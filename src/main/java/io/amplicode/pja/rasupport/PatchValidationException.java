@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.ErrorResponse;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.*;
@@ -21,25 +22,14 @@ import java.util.function.Function;
  * Similar to {@link MethodArgumentNotValidException} and {@link BindException}.
  * But extends from RuntimeException, as it's supposed to be thrown inside of controller handler body.
  */
-public class PatchValidationException extends RuntimeException implements ErrorResponse {
+public class PatchValidationException extends ErrorResponseException {
 
 	private final BindingResult bindingResult;
-	private final ProblemDetail body;
 
 	public PatchValidationException(BindingResult bindingResult) {
+		super(HttpStatus.BAD_REQUEST, ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Invalid patch request content."), null);
 		Assert.notNull(bindingResult, "BindingResult must not be null");
 		this.bindingResult = bindingResult;
-		this.body = ProblemDetail.forStatusAndDetail(getStatusCode(), "Invalid patch request content.");
-	}
-
-	@Override
-	public HttpStatusCode getStatusCode() {
-		return HttpStatus.BAD_REQUEST;
-	}
-
-	@Override
-	public ProblemDetail getBody() {
-		return this.body;
 	}
 
 	@Override

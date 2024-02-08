@@ -103,6 +103,17 @@ class PetResourceTest {
     }
 
     @Test
+    public void getListQueryByOwnerFirstNameOrOwnerLastName() throws Exception {
+        mockMvc.perform(get("/rest/pets")
+                        .param("ownerFirstName", "et")
+                        .param("ownerLastName", "is")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.numberOfElements", is(2)));
+    }
+
+
+    @Test
     public void getListQueryByBirthDate() throws Exception {
         mockMvc.perform(get("/rest/pets")
                         .param("birthDateGreaterThan", "2000-01-01")
