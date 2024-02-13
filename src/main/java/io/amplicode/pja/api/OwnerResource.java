@@ -33,7 +33,6 @@ public class OwnerResource {
     private final OwnerMapper mapper;
     private final Validator validator;
     private final ObjectMapper objectMapper;
-
     private final RaPatchUtil raPatchUtil;
 
     @GetMapping
@@ -191,4 +190,3 @@ public class OwnerResource {
         return existingOwners.stream().map(BaseEntity::getId).toList();
     }
 }
-

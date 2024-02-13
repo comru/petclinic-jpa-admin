@@ -8,8 +8,6 @@ import io.amplicode.pja.api.mapper.PetMapper;
 import io.amplicode.pja.model.Pet;
 import io.amplicode.pja.rasupport.RaPatchUtil;
 import io.amplicode.pja.repository.PetRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,21 +18,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/rest/pets")
 public class PetResource {
 
-    private final PetRepository petRepository;
     private final PetMapper petMapper;
-    @PersistenceContext
-    private final EntityManager entityManager;
     private final RaPatchUtil raPatchUtil;
-
+    private final PetRepository petRepository;
 
     @GetMapping
     public Page<PetDto> getList(@ModelAttribute PetFilter filter, @PageableDefault(size = 15) Pageable pageable) {
@@ -72,7 +65,6 @@ public class PetResource {
         Optional<Pet> petOptional = petRepository.findById(id);
         return petOptional.map(petMapper::toDto)
                 .orElseThrow(() -> createEntityNotFoundException(id));
-
     }
 
     @GetMapping("/by-ids")
