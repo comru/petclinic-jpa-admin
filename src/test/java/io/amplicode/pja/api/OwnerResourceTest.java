@@ -1,4 +1,4 @@
-package io.amplicode.pja;
+package io.amplicode.pja.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

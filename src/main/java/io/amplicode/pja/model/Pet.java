@@ -3,6 +3,7 @@ package io.amplicode.pja.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,6 +13,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+
+@FieldNameConstants(innerTypeName = "PetFields")
 @Getter
 @Setter
 @Entity
@@ -29,8 +32,6 @@ public class Pet extends NamedEntity {
     @JoinColumn(name = "type_id")
     private PetType type;
 
-    //TODO CascadeType.MERGE load all visits collection as eager
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "pet")
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE, CascadeType.DETACH}, mappedBy = "pet")
     @OrderBy("visit_date ASC")
     private Set<Visit> visits = new LinkedHashSet<>();
@@ -43,4 +44,5 @@ public class Pet extends NamedEntity {
     @Column(name = "user_data")
     private Map<String, Object> userData;
 
+    public static class PetFields extends Fields {}
 }
