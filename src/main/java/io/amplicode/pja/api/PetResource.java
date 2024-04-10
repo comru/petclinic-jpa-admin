@@ -11,6 +11,7 @@ import io.amplicode.pja.repository.PetRepository;
 import io.amplicode.rautils.patch.ObjectPatcher;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,7 +34,8 @@ public class PetResource {
     private final ObjectPatcher objectPatcher;
 
     @GetMapping
-    public Page<PetDto> getList(@ModelAttribute PetFilter filter, @PageableDefault(size = 15) Pageable pageable) {
+    public Page<PetDto> getList(@ParameterObject @ModelAttribute PetFilter filter,
+                                @ParameterObject @PageableDefault(size = 15) Pageable pageable) {
         Specification<Pet> specification = filter.toSpecification();
         Page<Pet> page = petRepository.findAll(specification, pageable);
         return page.map(petMapper::toDto);
@@ -108,42 +110,16 @@ public class PetResource {
 
     @DeleteMapping("/{id}")
     public PetDto delete(@PathVariable Long id) {
-        //TODO case 1
-//        Optional<PetDto> petDto = petRepository.findById(id)
-//                .map(petMapper::toDto);
-//
-//        if (petDto.isPresent()) {
-//            petRepository.deleteById(id);
-//        }
-//        return ResponseEntity.of(petDto);
-
-        //TODO case 2
         PetDto petDto = petRepository.findById(id)
                 .map(petMapper::toDto)
                 .orElseThrow(() -> createEntityNotFoundException(id));
 
         petRepository.deleteAllByIdInBatch(List.of(id));
         return petDto;
-
-        //TODO case 3
-//        petRepository.deleteById(id);
-
-        //TODO case 4
-//        petRepository.deleteAllByIdInBatch(List.of(id));
-//        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
     public List<Long> deleteMany(@RequestParam List<Long> ids) {
-        //The ids of the deleted records (optional)
-        //TODO case 1
-//        List<Pet> existingEntities = petRepository.findAllById(ids);
-//
-//        petRepository.deleteAllById(ids);
-//
-//        return existingEntities.stream().map(e -> e.getId()).toList();
-
-        //TODO case 2
         List<BaseDto> existingEntities = petRepository.findByIdIn(ids, BaseDto.class);
         List<Long> toDeleteIds = existingEntities.stream()
                 .map(BaseDto::id)
@@ -152,13 +128,6 @@ public class PetResource {
         petRepository.deleteAllByIdInBatch(toDeleteIds);
 
         return toDeleteIds;
-
-        //TODO case 3
-//        petRepository.deleteAllById(ids);
-
-        //TODO case 4
-//        petRepository.deleteAllByIdInBatch(ids);
-//        return ResponseEntity.ok().build();
     }
 
     private ResponseStatusException createEntityNotFoundException(Long id) {

@@ -12,6 +12,7 @@ import io.amplicode.pja.repository.OwnerRepository;
 import io.amplicode.rautils.patch.ObjectPatcher;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,7 +37,8 @@ public class OwnerResource {
     private final ObjectPatcher objectPatcher;
 
     @GetMapping
-    public Page<OwnerDto> getList(@ModelAttribute OwnerFilter filter, Pageable pageable) {
+    public Page<OwnerDto> getList(@ParameterObject @ModelAttribute OwnerFilter filter,
+                                  @ParameterObject Pageable pageable) {
         Specification<Owner> specification = filter.toSpecification();
         Page<Owner> page = repository.findAll(specification, pageable);
         return page.map(mapper::toDto);
