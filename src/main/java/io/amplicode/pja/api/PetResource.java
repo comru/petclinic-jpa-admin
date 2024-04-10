@@ -1,13 +1,14 @@
 package io.amplicode.pja.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.amplicode.pja.api.dto.BaseDto;
 import io.amplicode.pja.api.dto.PetDto;
 import io.amplicode.pja.api.dto.PetFilter;
 import io.amplicode.pja.api.dto.PetMinimalDto;
 import io.amplicode.pja.api.mapper.PetMapper;
 import io.amplicode.pja.model.Pet;
-import io.amplicode.pja.rasupport.RaPatchUtil;
 import io.amplicode.pja.repository.PetRepository;
+import io.amplicode.rautils.patch.ObjectPatcher;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,42 +29,19 @@ import java.util.*;
 public class PetResource {
 
     private final PetMapper petMapper;
-    private final RaPatchUtil raPatchUtil;
     private final PetRepository petRepository;
+    private final ObjectPatcher objectPatcher;
 
     @GetMapping
     public Page<PetDto> getList(@ModelAttribute PetFilter filter, @PageableDefault(size = 15) Pageable pageable) {
         Specification<Pet> specification = filter.toSpecification();
         Page<Pet> page = petRepository.findAll(specification, pageable);
         return page.map(petMapper::toDto);
-
-        //Correct load by projection
-//        Page<PetDto> page = searchHelper.findAll(
-//                Pet.class,
-//                PetDto.class,
-//                List.of("id", "name", "birthDate", "type.id", "owner.id"),
-//                specification,
-//                pageable);
-//        return ResponseEntity.ok(page);
     }
 
 
     @GetMapping("/{id}")
     public PetDto getOne(@PathVariable("id") Long id) {
-        //dynamic projection based class
-//        Optional<PetDto> petOptional = petRepository.findById(id, PetDto.class);
-//        return ResponseEntity.of(petOptional);
-
-        //dynamic projection
-//        Optional<PetDeepInfo> petOptio
-//        nal = petRepository.findById(id, PetDeepInfo.class);
-//        return ResponseEntity.of(petOptional);
-
-        //при чем разный результат будет при загрузке ассоциаций с @Value и без @Value, а если у одной аннотации указан
-        //@Value то вообще упадет)
-//        Optional<PetFlatInfo> petOptional = petRepository.findById(id, PetFlatInfo.class);
-//        return ResponseEntity.of(petOptional);
-
         Optional<Pet> petOptional = petRepository.findById(id);
         return petOptional.map(petMapper::toDto)
                 .orElseThrow(() -> createEntityNotFoundException(id));
@@ -86,14 +66,14 @@ public class PetResource {
     }
 
     @PutMapping("/{id}")
-    public PetDto update(@PathVariable Long id, @RequestBody String petDtoPatch) {
+    public PetDto update(@PathVariable Long id, @RequestBody JsonNode petDtoPatch) {
         Pet pet = petRepository.findById(id).orElse(null);
         if (pet == null) {
             throw createEntityNotFoundException(id);
         }
 
         PetDto petDto = petMapper.toDto(pet);
-        petDto = raPatchUtil.patchAndValidate(petDto, petDtoPatch);
+        petDto = objectPatcher.patchAndValidate(petDto, petDtoPatch);
 
         if (petDto.id() != null && !petDto.id().equals(id)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id");
@@ -111,7 +91,7 @@ public class PetResource {
 
         for (Pet pet: toUpdatePets) {
             PetDto petDto = petMapper.toDto(pet);
-            petDto = raPatchUtil.patchAndValidate(petDto, patchJson);
+            petDto = objectPatcher.patchAndValidate(petDto, patchJson);
 
             if (petDto.id() != null && !petDto.id().equals(pet.getId())) { // attempt to change entity id
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id");

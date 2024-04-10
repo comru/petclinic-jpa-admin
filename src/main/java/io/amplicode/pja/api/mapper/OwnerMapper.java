@@ -21,7 +21,7 @@ public interface OwnerMapper {
     void update(OwnerDto ownerDto, @MappingTarget Owner owner);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void update(@MappingTarget OwnerDto updateOwnerDto,  OwnerDto currentOwnerDto);
+    void update(@MappingTarget OwnerDto updateOwnerDto, OwnerDto currentOwnerDto);
 
     default List<Long> petsToPetIds(List<Pet> pets) {
         return pets.stream().map(Pet::getId).collect(Collectors.toList());

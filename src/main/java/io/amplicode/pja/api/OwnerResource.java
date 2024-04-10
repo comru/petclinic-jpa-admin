@@ -8,8 +8,8 @@ import io.amplicode.pja.api.mapper.OwnerMapper;
 import io.amplicode.pja.model.BaseEntity;
 import io.amplicode.pja.model.Owner;
 import io.amplicode.pja.api.dto.OwnerDto;
-import io.amplicode.pja.rasupport.RaPatchUtil;
 import io.amplicode.pja.repository.OwnerRepository;
+import io.amplicode.rautils.patch.ObjectPatcher;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,7 +33,7 @@ public class OwnerResource {
     private final OwnerMapper mapper;
     private final Validator validator;
     private final ObjectMapper objectMapper;
-    private final RaPatchUtil raPatchUtil;
+    private final ObjectPatcher objectPatcher;
 
     @GetMapping
     public Page<OwnerDto> getList(@ModelAttribute OwnerFilter filter, Pageable pageable) {
@@ -116,13 +116,13 @@ public class OwnerResource {
 
     @PatchMapping("/by-starter/{id}")
     public OwnerDto patchByStarter(@PathVariable Long id,
-                                   @RequestBody String patchJson) throws BindException, IOException {
+                                   @RequestBody JsonNode patchJson) {
         Owner owner = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Entity with id `%s` not found".formatted(id)));
 
         OwnerDto ownerDto = mapper.toDto(owner);
-        ownerDto = raPatchUtil.patchAndValidate(ownerDto, patchJson);
+        ownerDto = objectPatcher.patchAndValidate(ownerDto, patchJson);
 
         mapper.update(ownerDto, owner);
         owner = repository.save(owner);

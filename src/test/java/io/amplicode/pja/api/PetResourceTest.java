@@ -9,10 +9,7 @@ import io.amplicode.pja.repository.PetRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.hamcrest.core.IsNull;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +26,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -198,8 +196,7 @@ class PetResourceTest {
 
     @Test
     public void getOne() throws Exception {
-        mockMvc.perform(get("/rest/pets/1")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/rest/pets/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("Leo")))
                 .andExpect(jsonPath("$.ownerId", is(1)))
