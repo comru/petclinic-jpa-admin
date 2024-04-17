@@ -67,6 +67,20 @@ public class PetResource {
         return petMapper.toDto(pet);
     }
 
+    @PostMapping("/many")
+    public List<PetDto> createMany(@RequestBody List<PetDto> petDtos) {
+        if (petDtos.stream().anyMatch(dto -> dto.id() != null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A new pet cannot already have an ID");
+        }
+        List<Pet> pets = petDtos.stream()
+                .map(petMapper::toEntity)
+                .toList();
+        return petRepository.saveAll(pets)
+                .stream()
+                .map(petMapper::toDto)
+                .toList();
+    }
+
     @PutMapping("/{id}")
     public PetDto update(@PathVariable Long id, @RequestBody JsonNode petDtoPatch) {
         Pet pet = petRepository.findById(id).orElse(null);

@@ -9,7 +9,10 @@ import io.amplicode.pja.repository.PetRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.hamcrest.core.IsNull;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,8 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -228,6 +230,42 @@ class PetResourceTest {
                         jsonPath("$[3].name", is("Samantha")),
                         jsonPath("$[3].birthDate").doesNotExist()
                 );
+    }
+
+    @Test
+    public void createMany() throws Exception {
+        mockMvc.perform(post("/rest/pets/many")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                [
+                                    {
+                                        "name": "Buddy",
+                        	            "birthDate": "2020-04-01",
+                        	            "typeId": 1,
+                        	            "ownerId": 1
+                                    },
+                                    {
+                                        "name": "Bella",
+                        	            "birthDate": "2020-04-01",
+                        	            "typeId": 2,
+                        	            "ownerId": 2
+                                    }
+                                ]
+                                """))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$[0].id", notNullValue()),
+                        jsonPath("$[0].name", is("Buddy")),
+                        jsonPath("$[0].ownerId", is(1)),
+                        jsonPath("$[0].typeId", is(1)),
+                        jsonPath("$[0].birthDate", is("2020-04-01")),
+                        jsonPath("$[1].id", notNullValue()),
+                        jsonPath("$[1].name", is("Bella")),
+                        jsonPath("$[1].ownerId", is(2)),
+                        jsonPath("$[1].typeId", is(2)),
+                        jsonPath("$[1].birthDate", is("2020-04-01"))
+                )
+                .andDo(print());
     }
 
     @Test
