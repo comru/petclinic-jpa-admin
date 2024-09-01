@@ -5,6 +5,8 @@ import io.amplicode.pja.model.Pet.PetFields;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
@@ -14,6 +16,10 @@ import java.util.List;
 public interface PetRepository extends JpaRepository<Pet, Long>, JpaSpecificationExecutor<Pet> {
 
     <T> List<T> findByIdIn(Collection<Long> ids, Class<T> projection);
+
+    @Transactional
+    @Modifying
+    void deleteByNameInIgnoreCase(Collection<String> names);
 
     class Specifications {
         public static Specification<Pet> nameContainsIgnoreCase(String value) {

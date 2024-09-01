@@ -13,7 +13,6 @@ import java.util.Optional;
 
 public interface OwnerRepository extends JpaRepository<Owner, Long>, JpaSpecificationExecutor<Owner> {
 
-    @EntityGraph(type = EntityGraph.EntityGraphType.LOAD, attributePaths = "pets")
     @Override
     Page<Owner> findAll(Specification<Owner> spec, Pageable pageable);
 

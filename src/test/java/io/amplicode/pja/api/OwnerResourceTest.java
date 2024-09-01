@@ -4,9 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.amplicode.pja.model.Owner;
 import io.amplicode.pja.repository.OwnerRepository;
-import io.amplicode.pja.repository.PetRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,13 +36,8 @@ class OwnerResourceTest {
     private ObjectMapper objectMapper;
     @Autowired
     private OwnerRepository ownerRepository;
-    @PersistenceContext
-    private EntityManager entityManager;
 
     private final List<Long> afterTestToDeleteIds = new ArrayList<>();
-
-    @Autowired
-    private PetRepository petRepository;
 
     @BeforeEach
     void setUp() {
@@ -87,7 +79,7 @@ class OwnerResourceTest {
                         .param("city", "mad")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.numberOfElements", is(1)))
+                .andExpect(jsonPath("$.last", is(true)))
                 .andExpect(jsonPath("$.content[0].firstName", is("David")));
     }
 
@@ -99,11 +91,7 @@ class OwnerResourceTest {
                         .param("sort", "firstName")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.numberOfElements", is(5)))
                 .andExpect(jsonPath("$.content", hasSize(5)))
-                .andExpect(jsonPath("$.totalElements", is(10)))
-                .andExpect(jsonPath("$.totalPages", is(2)))
-                .andExpect(jsonPath("$.first", is(false)))
                 .andExpect(jsonPath("$.last", is(true)))
                 .andExpect(jsonPath("$.content[0].firstName", is("Harold")))
                 .andExpect(jsonPath("$.content[1].firstName", is("Jean")))

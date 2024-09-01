@@ -15,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Window;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -37,10 +39,14 @@ public class OwnerResource {
     private final ObjectPatcher objectPatcher;
 
     @GetMapping
-    public Page<OwnerDto> getList(@ParameterObject @ModelAttribute OwnerFilter filter,
-                                  @ParameterObject Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Window<OwnerDto> getList(@ParameterObject @ModelAttribute OwnerFilter filter,
+                                    @ParameterObject Pageable pageable) {
         Specification<Owner> specification = filter.toSpecification();
-        Page<Owner> page = repository.findAll(specification, pageable);
+        Window<Owner> page = repository.findBy(specification, fluentQuery -> fluentQuery
+                .sortBy(pageable.getSort())
+                .limit(pageable.getPageSize())
+                .scroll(pageable.toScrollPosition()));
         return page.map(mapper::toDto);
     }
 

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,11 +35,11 @@ public class PetResource {
     private final ObjectPatcher objectPatcher;
 
     @GetMapping
-    public Page<PetDto> getList(@ParameterObject @ModelAttribute PetFilter filter,
+    public PagedModel<PetDto> getList(@ParameterObject @ModelAttribute PetFilter filter,
                                 @ParameterObject @PageableDefault(size = 15) Pageable pageable) {
         Specification<Pet> specification = filter.toSpecification();
         Page<Pet> page = petRepository.findAll(specification, pageable);
-        return page.map(petMapper::toDto);
+        return new PagedModel<>(page.map(petMapper::toDto));
     }
 
 

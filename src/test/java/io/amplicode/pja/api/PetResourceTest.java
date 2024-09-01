@@ -98,7 +98,7 @@ class PetResourceTest {
                         .param("birthDateLessThan", "2000-12-31")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.numberOfElements", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)))
                 .andExpect(jsonPath("$.content[0].name", is("Jewel")));
     }
 
@@ -109,7 +109,7 @@ class PetResourceTest {
                         .param("ownerLastName", "is")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.numberOfElements", is(2)));
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
 
@@ -137,7 +137,7 @@ class PetResourceTest {
                         .param("sort", "name")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.numberOfElements", is(2)))
+                .andExpect(jsonPath("$.page.totalElements", is(2)))
                 .andExpect(jsonPath("$.content[0].name", is("Max")))
                 .andExpect(jsonPath("$.content[0].ownerId", is(6)))
                 .andExpect(jsonPath("$.content[1].name", is("Samantha")))
@@ -151,7 +151,7 @@ class PetResourceTest {
                         .param("q", "Lu")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.numberOfElements", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)))
                 .andExpect(jsonPath("$.content[0].typeId", is(2)));
     }
 
@@ -162,12 +162,10 @@ class PetResourceTest {
                         .param("sort", "name")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.numberOfElements", is(5)))
+                .andExpect(jsonPath("$.page.size", is(5)))
+                .andExpect(jsonPath("$.page.totalElements", is(13)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.content", hasSize(5)))
-                .andExpect(jsonPath("$.totalElements", is(13)))
-                .andExpect(jsonPath("$.totalPages", is(3)))
-                .andExpect(jsonPath("$.first", is(true)))
-                .andExpect(jsonPath("$.last", is(false)))
                 .andExpect(jsonPath("$.content[0].name", is("Basil")))
                 .andExpect(jsonPath("$.content[1].name", is("Freddy")))
                 .andExpect(jsonPath("$.content[2].name", is("George")))
@@ -183,12 +181,9 @@ class PetResourceTest {
                         .param("sort", "name")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.numberOfElements", is(5)))
+                .andExpect(jsonPath("$.page.totalElements", is(13)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.content", hasSize(5)))
-                .andExpect(jsonPath("$.totalElements", is(13)))
-                .andExpect(jsonPath("$.totalPages", is(3)))
-                .andExpect(jsonPath("$.first", is(false)))
-                .andExpect(jsonPath("$.last", is(false)))
                 .andExpect(jsonPath("$.content[0].name", is("Leo")))
                 .andExpect(jsonPath("$.content[1].name", is("Lucky")))
                 .andExpect(jsonPath("$.content[2].name", is("Lucky")))
@@ -266,6 +261,8 @@ class PetResourceTest {
                         jsonPath("$[1].birthDate", is("2020-04-01"))
                 )
                 .andDo(print());
+
+        petRepository.deleteByNameInIgnoreCase(List.of("Buddy", "Bella"));
     }
 
     @Test
