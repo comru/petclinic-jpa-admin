@@ -2,12 +2,13 @@ package io.amplicode.pja.api.mapper;
 
 import io.amplicode.pja.api.dto.PetDto;
 import io.amplicode.pja.api.dto.PetMinimalDto;
-import io.amplicode.pja.model.Owner;
 import io.amplicode.pja.model.Pet;
-import io.amplicode.pja.model.PetType;
-import org.mapstruct.*;
+import org.mapstruct.InheritInverseConfiguration;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(config = MapStructConfig.class)
 public interface PetMapper {
 
     @Mapping(source = "ownerId", target = "owner.id")
@@ -22,22 +23,4 @@ public interface PetMapper {
     @Mapping(source = "typeId", target = "type")
     @Mapping(source = "ownerId", target = "owner")
     void update(PetDto petDto, @MappingTarget Pet pet);
-
-    default Owner createOwner(Long ownerId) {
-        if (ownerId == null) {
-            return null;
-        }
-        Owner owner = new Owner();
-        owner.setId(ownerId);
-        return owner;
-    }
-
-    default PetType createPetType(Long typeId) {
-        if (typeId == null) {
-            return null;
-        }
-        PetType petType = new PetType();
-        petType.setId(typeId);
-        return petType;
-    }
 }
